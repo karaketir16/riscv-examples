@@ -1,0 +1,62 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start QEMU",
+            "type": "shell",
+            "command": "echo 'QEMU started';qemu-riscv32-static -g 12345 ${command:cmake.launchTargetPath}",
+            "problemMatcher": [
+                {
+                "pattern": [
+                    {
+                    "regexp": ".",
+                    "file": 1,
+                    "location": 2,
+                    "message": 3
+                    }
+                ],
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "QEMU started",
+                    }
+                }
+            ],
+            "isBackground": true,
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "showOutput": "always"
+            }
+        },      
+        {
+            "label": "Start QEMU Bare",
+            "type": "shell",
+            "command": "echo 'QEMU started';qemu-system-riscv32 -S -gdb tcp::12345 -nographic -serial mon:stdio -machine virt -bios ${command:cmake.launchTargetPath}",
+            "isBackground": true,
+            "dependsOn": "build",
+            "problemMatcher": [
+                {
+                "pattern": [
+                    {
+                    "regexp": ".",
+                    "file": 1,
+                    "location": 2,
+                    "message": 3
+                    }
+                ],
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "QEMU started",
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "showOutput": "always"
+            }
+        }
+    ]
+}
+
+
