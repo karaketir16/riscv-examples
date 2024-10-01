@@ -24,10 +24,3 @@ target_link_libraries(${ExecName})
 # set(CMAKE_EXE_LINKER_FLAGS "-T baremetal.ld")
 
 
-# Optional: Add custom commands to run the program with QEMU
-add_custom_target(run_${ExecName}
-    COMMAND qemu-system-riscv32 -nographic -serial mon:stdio -machine virt -bios ${ExecName}
-    DEPENDS ${ExecName}
-    COMMENT "Running the program with QEMU"
-)
-

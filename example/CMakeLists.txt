@@ -28,12 +28,3 @@ add_subdirectory(factorialReq)
 add_subdirectory(writeTest)
 add_subdirectory(qemuBare)
 
-# Specify the linker script if needed (optional)
-# set(CMAKE_EXE_LINKER_FLAGS "-T your_linker_script.ld")
-
-# Optional: Add custom commands to run the program with QEMU
-# add_custom_target(run
-#     COMMAND qemu-riscv32-static riscv_program
-#     DEPENDS riscv_program
-#     COMMENT "Running the program with QEMU"
-# )
