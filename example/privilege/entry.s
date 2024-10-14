@@ -1,6 +1,11 @@
 .section .text
 .globl start
 
+# riscv64-unknown-elf-as -g entry.s -o entry.o && riscv64-unknown-elf-ld -T baremetal.ld entry.o -o entry
+# qemu-system-riscv64 -machine virt -cpu sifive-u54 -smp 1 -s -S -nographic -bios none -kernel entry
+# or 
+# qemu-system-riscv64 -machine virt -cpu rv64 -smp 1 -s -S -nographic -bios none -kernel entry
+
 start:
     # Load address of 'supervisor' into t0 and set mepc
     la      t0, supervisor
