@@ -1,0 +1,10 @@
+# Set the minimum CMake version
+cmake_minimum_required(VERSION 3.10)
+
+
+# Set the compiler flags
+set(CMAKE_C_FLAGS "-march=rv32im -mabi=ilp32 -nostdlib -static")
+set(CMAKE_ASM_FLAGS "-march=rv32im -mabi=ilp32 -nostdlib -static")
+
+add_subdirectory(privilege)
+add_subdirectory(qemuBare)

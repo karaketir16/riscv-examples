@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Start QEMU",
+            "label": "Start QEMU User",
             "type": "shell",
             "command": "echo 'QEMU started';qemu-riscv32-static -g 12345 ${command:cmake.launchTargetPath}",
             "problemMatcher": [
@@ -29,7 +29,7 @@
             }
         },      
         {
-            "label": "Start QEMU Bare",
+            "label": "Start QEMU System",
             "type": "shell",
             "command": "echo 'QEMU started';qemu-system-riscv32 -S -gdb tcp::12345 -nographic -serial mon:stdio -machine virt -bios ${command:cmake.launchTargetPath}",
             "isBackground": true,
