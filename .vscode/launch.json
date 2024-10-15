@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "QEMU RISC-V Debug Test",
+            "name": "Debug RISC-V User Mode",
             "type": "cppdbg",
             "request": "launch",
             "program": "${command:cmake.launchTargetPath}",
@@ -12,11 +12,11 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/riscv/bin/riscv32-unknown-elf-gdb",
+            "miDebuggerPath": "/opt/riscv32/bin/riscv32-unknown-elf-gdb",
             "miDebuggerServerAddress": "localhost:12345",
             "filterStderr": true,
             "filterStdout": true,
-            "preLaunchTask": "Start QEMU",
+            "preLaunchTask": "Start QEMU User",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for GDB",
@@ -34,7 +34,7 @@
             "cwd": "${workspaceFolder}",
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/riscv/bin/riscv32-unknown-elf-gdb",
+            "miDebuggerPath": "/opt/riscv32/bin/riscv32-unknown-elf-gdb",
             "miDebuggerServerAddress": "localhost:12345",
             "setupCommands": [
                 {
@@ -43,7 +43,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Start QEMU Bare",
+            "preLaunchTask": "Start QEMU System",
             "logging": {
                 "trace": true,
                 "traceResponse": true,
