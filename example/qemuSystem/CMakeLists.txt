@@ -8,3 +8,4 @@ set(CMAKE_ASM_FLAGS "-nostdlib -static")
 
 add_subdirectory(privilege)
 add_subdirectory(qemuBare)
+add_subdirectory(timer)
