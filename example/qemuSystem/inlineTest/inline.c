@@ -1,5 +1,10 @@
 void supervisor()
 {
+    volatile int x,y,z,t,a,b,c,d;
+}
+
+void is_same()
+{
 
 }
 
@@ -15,11 +20,19 @@ int main(){
             : /* no input */ [svisor] "i"(supervisor)
             : );
         
-        asm volatile ("mv t0, %[svisor]"
+        asm volatile (
+            "mv t0, %0\n"
+            "la t1, %1\n"
+            "bne t0, t1, cont\n"
+            "call is_same\n"
+            "cont:"
             : /* no output */
-            : /* no input */ [svisor] "r"(supervisor)
+            : /* no input */ "r"(supervisor), "i"(supervisor)
             : );
     }
+
+
+
 }
 
 void custom_exit() {
