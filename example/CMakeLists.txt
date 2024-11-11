@@ -8,8 +8,8 @@ project(RISCV_Project C ASM)
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR riscv32)
 
-set(CMAKE_C_COMPILER "/opt/riscv32/bin/riscv32-unknown-elf-gcc")
-set(CMAKE_ASM_COMPILER "/opt/riscv32/bin/riscv32-unknown-elf-gcc")
+set(CMAKE_C_COMPILER "/opt/riscv/bin/riscv64-unknown-elf-gcc")
+set(CMAKE_ASM_COMPILER "/opt/riscv/bin/riscv64-unknown-elf-gcc")
 
 # Set the build type to Debug if not set
 if(NOT CMAKE_BUILD_TYPE)

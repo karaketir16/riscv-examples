@@ -8,9 +8,4 @@ display /x $medeleg
 display /i $pc
 
 b _start
-b mtrap
-b supervisor
-b spin
-b strap
-b other_interrupt
-b reset_sip
+b riscv_mtvec_mti

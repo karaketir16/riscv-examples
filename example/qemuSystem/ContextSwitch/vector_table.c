@@ -27,7 +27,7 @@ static void riscv_nop_user(void)       __attribute__ ((interrupt ("user")) );
 // Weak alias to the "NOP" implementations. If another function  
 void riscv_mtvec_exception(void) __attribute__ ((interrupt ("machine")     , weak, alias("riscv_nop_machine") )); 
 void riscv_mtvec_msi(void) __attribute__ ((interrupt ("machine")     , weak, alias("riscv_nop_machine") )); 
-void riscv_mtvec_mti(void) __attribute__ ((interrupt ("machine")     , weak, alias("riscv_nop_machine") ));
+
 void riscv_mtvec_mei(void) __attribute__ ((interrupt ("machine")     , weak, alias("riscv_nop_machine") ));
 void riscv_mtvec_ssi(void) __attribute__ ((interrupt ("supervisor")  , weak, alias("riscv_nop_machine") ));
 void riscv_mtvec_sti(void) __attribute__ ((interrupt ("supervisor")  , weak, alias("riscv_nop_machine") ));

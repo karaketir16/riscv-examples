@@ -56,31 +56,4 @@ int main(void) {
     return 0;
 }
 
-#pragma GCC push_options
-// Force the alignment for mtvec.BASE. A 'C' extension program could be aligned to to bytes.
-#pragma GCC optimize ("align-functions=4")
-// The 'riscv_mtvec_mti' function is added to the vector table by the vector_table.c
-void riscv_mtvec_mti(void)  {
-    // Timer exception, re-program the timer for a one second tick.
-    mtimer_set_raw_time_cmp(MTIMER_SECONDS_TO_CLOCKS(1));
-    timestamp = mtimer_get_raw_time();
-    uint_xlen_t val = csr_read_mstatus() & MSTATUS_MIE_BIT_MASK;
-}
-// The 'riscv_mtvec_exception' function is added to the vector table by the vector_table.c
-// This function looks at the cause of the exception, if it is an 'ecall' instruction then increment a global counter.
-void riscv_mtvec_exception(void)  {
-    uint_xlen_t val = csr_read_mstatus() & MSTATUS_MIE_BIT_MASK;
-    uint_xlen_t this_cause = csr_read_mcause();
-    uint_xlen_t this_pc    = csr_read_mepc();
-    //uint_xlen_t this_value = csr_read_mtval();
-    switch (this_cause) {
-        case RISCV_EXCP_ENVIRONMENT_CALL_FROM_M_MODE:
-            ecall_count++;
-            // Make sure the return address is the instruction AFTER ecall
-            csr_write_mepc(this_pc+4);
-            break;
-    }
-}
-#pragma GCC pop_options
-
 
