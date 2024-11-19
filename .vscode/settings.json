@@ -1,3 +1,10 @@
 {
-    "cmake.sourceDirectory": "/home/karaketir16/proj/riscv/example"
+    "cmake.sourceDirectory": "/workspace/example",
+    "files.associations": {
+        "riscv-csr.h": "c",
+        "context.h": "c",
+        "timer.h": "c",
+        "riscv-interrupts.h": "c",
+        "compare": "c"
+    }
 }

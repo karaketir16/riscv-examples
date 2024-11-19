@@ -41,6 +41,9 @@ void riscv_mtvec_exception(void) __attribute__ ((interrupt ("machine")) );
 void riscv_mtvec_msi(void) __attribute__ ((interrupt ("machine") )); 
 /** Machine mode timer interrupt */
 void riscv_mtvec_mti(void) __attribute__ ((naked));
+
+void riscv_mtvec_mti_2(void) __attribute__((naked));
+
 /** Machine mode al interrupt */
 void riscv_mtvec_mei(void) __attribute__ ((interrupt ("machine") ));
 

@@ -16,7 +16,7 @@
 
 #ifndef MTIME_FREQ_HZ
 // Timer for HiFive board
-#define MTIME_FREQ_HZ 32768 * 100
+#define MTIME_FREQ_HZ 32768 * 10
 #endif
 
 #define MTIMER_SECONDS_TO_CLOCKS(SEC)           \

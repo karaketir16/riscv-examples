@@ -9,3 +9,4 @@ display /i $pc
 
 b _start
 b riscv_mtvec_mti
+b riscv_mtvec_exception
