@@ -17,26 +17,49 @@ static inline void restore_next_task() __attribute__((always_inline));
 TaskContext tasks[MAX_TASKS];
 int currentTaskID = 0;
 
+
+#define UART_BASE 0x10000000
+
+// Function to write a character to UART
+static void uart_putchar(char c) {
+    *((volatile char *)UART_BASE) = c;
+}
+
+// Function to print a string to UART
+static void print(const char *str) {
+    while (*str) {
+        uart_putchar(*str++);
+    }
+}
+
+
 #pragma GCC push_options
 // Force the alignment for mtvec.BASE. A 'C' extension program could be aligned to bytes.
 #pragma GCC optimize ("align-functions=4")
 
 
-// The 'riscv_mtvec_mti' function is added to the vector table by vector_table.c
-void riscv_mtvec_mti_2(void) {
+#define SWITCH_PERIOD 100
 
-    save_context();
+#define RISCV_MTVEC_MODE_VECTORED 1
 
-    mtimer_set_raw_time_cmp(MTIMER_SECONDS_TO_CLOCKS(1));
+void managerTask(){
 
-    restore_context();
+    // Global interrupt disable
+    csr_clr_bits_mstatus(MSTATUS_MIE_BIT_MASK);
+    csr_write_mie(0);
+    
+    // Setup the IRQ handler entry point, set the mode to vectored
+    csr_write_mtvec((uint_xlen_t) riscv_mtvec_table | RISCV_MTVEC_MODE_VECTORED);
 
-    __asm__ volatile (
-        "mret"
-        :
-        :
-        : "memory"
-    );
+    // Enable MIE.MTI
+    csr_set_bits_mie(MIE_MTI_BIT_MASK);
+
+    mtimer_set_raw_time_cmp(MTIMER_MSEC_TO_CLOCKS(SWITCH_PERIOD));
+
+    // Global interrupt enable 
+    set_with_csrrsi(mstatus, MSTATUS_MIE_BIT_MASK); // Without modifying any general purphose regsiters, but inportant in this case, we started it just
+    
+    while(1); //wait for other tasks
 }
 
 // The 'riscv_mtvec_mti' function is added to the vector table by vector_table.c
@@ -47,10 +70,11 @@ void riscv_mtvec_mti(void) {
     save_current_task();
 
     // Timer exception, re-program the timer for a one second tick.
-    mtimer_set_raw_time_cmp(MTIMER_SECONDS_TO_CLOCKS(1));
+    mtimer_set_raw_time_cmp(MTIMER_MSEC_TO_CLOCKS(SWITCH_PERIOD));
 
     // Move to the next task
-    currentTaskID = (currentTaskID + 1) % MAX_TASKS;
+    currentTaskID = (currentTaskID + 1) % (MAX_TASKS); 
+    currentTaskID = (currentTaskID == 0) ? currentTaskID + 1 : currentTaskID; //NOT RETURN TO tasks[0] managerTask
 
     restore_next_task();
 
@@ -132,40 +156,9 @@ void save_context() {
 
 void save_current_task()
 {
-    __asm__ volatile (
-        "nop\nnop\nnop\n"
-        :
-        : 
-        : "memory"
-    );
-    // __asm__ volatile (
-    //     "nop\nnop\n"
-    //     "csrr  %[PC], mepc          \n"
-    //     "sw    sp, %[stackPointer]  \n"
-    //     "nop\nnop\n"
-    //     : [stackPointer] "=r" (tasks[currentTaskID].stackPointer), [PC] "=r" (tasks[currentTaskID].PC)
-    //     : 
-    //     : "memory"
-    // );
-    __asm__ volatile (
-        "nop\nnop\n"
-        "csrr  t0, mepc           \n" // Read mepc into temporary register t0
-        "sw    t0, 0(%[PC])       \n" // Store t0 to the address of tasks[currentTaskID].PC
-        "sw    sp, 0(%[stackPointer]) \n" // Store sp to the address of tasks[currentTaskID].stackPointer
-        "nop\nnop\n"
-        : // No outputs directly
-        : [stackPointer] "r" (tasks[currentTaskID].stackPointer),
-        [PC] "r" (tasks[currentTaskID].PC)
-        : "t0", "memory"
-    );
-
-    __asm__ volatile (
-        "nop\nnop\nnop\n"
-        "nop\nnop\nnop\n"
-        : 
-        : 
-        : "memory"
-    );
+    register uintptr_t sp asm("sp");
+    tasks[currentTaskID].stackPointer = sp;
+    tasks[currentTaskID].PC = csr_read_mepc();
 }
 
 // Restore context in RISC-V
@@ -221,14 +214,9 @@ void restore_context() {
 
 void restore_next_task()
 {
-    __asm__ volatile (
-        "lw    sp, 0(%[stackPointer]) \n" // Load the stack pointer from memory
-        "csrw  mepc, %[PC]            \n" // Write PC value to mepc
-        :
-        : [stackPointer] "r" (tasks[currentTaskID].stackPointer),
-        [PC] "r" (*tasks[currentTaskID].PC) // Dereference PC to get the actual value
-        : "memory"
-    );
+    register uintptr_t sp asm("sp");
+    sp = tasks[currentTaskID].stackPointer;
+    csr_write_mepc(tasks[currentTaskID].PC);
 }
 
 #pragma GCC pop_options

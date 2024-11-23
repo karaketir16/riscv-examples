@@ -24,90 +24,52 @@ static volatile uint64_t timestamp = 0;
 // Expect this to increment one time per second - inside exception handler, after each return of MTI handler.
 static volatile uint64_t ecall_count = 0;
 
-#define RISCV_MTVEC_MODE_VECTORED 1
-
 #define UART_BASE 0x10000000
 
 // Function to write a character to UART
-void uart_putchar(char c) {
+static void uart_putchar(char c) {
     *((volatile char *)UART_BASE) = c;
 }
 
 // Function to print a string to UART
-void print(const char *str) {
+static void print(const char *str) {
     while (*str) {
         uart_putchar(*str++);
     }
 }
 
-void sleepSomeTime(){
-    volatile int x = 0x1FFFFFFF;
-    while(x --> 0);
+void sleepSomeTimeMsec(int m){
+    int untilWait = mtimer_get_raw_time() + MTIMER_MSEC_TO_CLOCKS(m);
+    while(mtimer_get_raw_time() < untilWait);
     return;
 }
 
 void task0(){
     while(1){
-        print("Hello World From Task 0\n");
-        sleepSomeTime();
+        print("ABCDE0\n");
+        // sleepSomeTimeMsec(0);
     }
 }
 
 void task1(){
     while(1){
-        print("Hello World From Task 1\n");
-        sleepSomeTime();
+        print("FGHIJ1\n");
+        // sleepSomeTimeMsec(0);
     }
 }
 
-void try_the_print_sleep(){
-    while(1){
-        print("Hello World Try 1\n");
-        sleepSomeTime();
-    }
-}
-
-uint8_t MyStackArea[1000 * MAX_TASKS];
+uint8_t MyStackArea[1000 * MAX_TASKS + 1];
 
 int main(void) {
     
-    tasks[0].PC             = (void*) &task0;
-    tasks[0].stackPointer   = (void*) &MyStackArea[0];
+    tasks[1].PC             = (uint_xlen_t) &task0;
+    tasks[1].stackPointer   = (uint_xlen_t) &MyStackArea[1000]; //stack grow decreasing
 
-    tasks[1].PC             = (void*) &task1;
-    tasks[1].stackPointer   = (void*) &MyStackArea[1000];
+    tasks[2].PC             = (uint_xlen_t) &task1;
+    tasks[2].stackPointer   = (uint_xlen_t) &MyStackArea[2000];
 
-    // Global interrupt disable
-    csr_clr_bits_mstatus(MSTATUS_MIE_BIT_MASK);
-    csr_write_mie(0);
-    
-    // Setup the IRQ handler entry point, set the mode to vectored
-    csr_write_mtvec((uint_xlen_t) riscv_mtvec_table | RISCV_MTVEC_MODE_VECTORED);
+    managerTask();
 
-    // Enable MIE.MTI
-    csr_set_bits_mie(MIE_MTI_BIT_MASK);
-
-    // Setup timer for 1 second interval
-    timestamp = mtimer_get_raw_time();
-    mtimer_set_raw_time_cmp(MTIMER_SECONDS_TO_CLOCKS(1));
-
-    // Global interrupt enable 
-    csr_set_bits_mstatus(MSTATUS_MIE_BIT_MASK);
-
-    task0();
-    
-
-    volatile uint32_t *mtimecmpl = (volatile uint32_t *)(RISCV_MTIMECMP_ADDR);
-    // Busy loop
-    do {
-        // Wait for timer interrupt
-        timestamp = mtimer_get_raw_time();
-        // __asm__ volatile("wfi");
-        // Try a synchronous exception.
-        // uint_xlen_t val = csr_read_mstatus() & MSTATUS_MIE_BIT_MASK;
-        // __asm__ volatile ("ecall");
-    } while (1);
-    
     // Will not reach here
     return 0;
 }
